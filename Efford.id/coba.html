@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title>:: Hubungi Kami ::</title>
+  </head>
+  <body onload="tampilkandataproject()">
+    <!-- content start -->
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+         <h3> Effort.id</h3>
+        </div>
+      </div>
+
+      <form id="form" class="formulir">
+        <label for="judul">Name</label>
+        <input type="text" name="judul" id="judul" class="judul">
+        <br/>
+        <label for="deskripsi">Email</label>
+        <textarea name="deskripsi" id="deskripsi" cols="30" rows="10"></textarea>
+        <br/>
+        <label for="uploud">Pesan</label>
+        <input type="text" name="uploud" id="uploud">
+        <button type="submit">SIMPAN</button>
+        </form> 
+    </div>
+    <!-- content end  -->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
+
+
+<script>
+    var xhr = buatXHR();
+    // membuat data agar bisa di tampilkan dalam halaman
+    function buatXHR() {
+        let xhr = null;
+        if (window.ActiveXObject) xhr = new ActiveXObject('Microsoft.XMLHTTP');
+        else if (window.XMLHttpRequest) xhr = new XMLHttpRequest();
+        return xhr;
+    }
+    // function untuk memproses data agar yang akan di tampilkan dalam web 
+    function tampilkandataproject(){
+        // get data in url 
+        // mengambil data pilihan dengan data dasar dari url
+            var url1 = window.location.href;
+            var split_url=url1.split('#');
+            var id_pencarian=split_url[1];
+            console.log(id_pencarian);
+
+            // proses pengambilan data api
+            let url = `http://localhost:3000/project/${id_pencarian}`;
+            xhr.open('GET', url);
+            xhr.onreadystatechange = function(){
+                if(xhr.readyState == 4 && xhr.status == 200){
+                    // menampilkan data pada tag html id="konten-data" yang terdapat di atas
+                    let data = JSON.parse(xhr.responseText);
+                    document.getElementById('konten-data').innerHTML = data.deskripsi;
+                }
+            }
+        xhr.send(null);
+
+        let form = document.getElementById('form');
+        
+        form.onsubmit = function(event){
+        
+          event.preventDefault();
+        
+          let judul = document.getElementById('judul').value;
+        
+          let deskripsi = document.getElementById('deskripsi').value;
+          
+          let uploud = document.getElementById('uploud').value;
+          simpanBerita(judul, deskripsi, uploud);
+        }
+        
+        function simpanBerita(judul,deskripsi,uploud){
+        
+          let url = 'http://localhost:3000/project';
+        
+          let waktuSaatIni = getWaktuSaatIni();
+        
+          let reqParams = `judul=${encodeURI(judul)}&waktu=${encodeURI(waktuSaatIni)}&descripsi=${encodeURI(deskripsi)}&file=${encodeURI(uploud)}`;
+        
+          xhr.open('POST', url);
+        
+          xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        
+          xhr.onreadystatechange = function(){
+        
+            if(xhr.readyState == 4 && xhr.status == 200){
+        
+              tampilkanDaftarJudulBerita();
+            }
+          }
+        
+          xhr.send(reqParams);
+       
+        }
+
+        function getWaktuSaatIni(){
+
+          let waktuSaatIni = new Date();
+          let tahun = waktuSaatIni.getFullYear();
+          let bulan = waktuSaatIni.getMonth();
+          let tanggal = waktuSaatIni.getDate();
+          let jam = waktuSaatIni.getHours();
+          let menit = waktuSaatIni.getMinutes();
+          let detik = waktuSaatIni.getSeconds();
+
+          return `${tahun}-${bulan}-${tanggal} ${jam}:${menit}:${detik}`;
+
+        }
+
+    }
+</script>
+
